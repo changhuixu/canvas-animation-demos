@@ -1,1 +1,1 @@
-# canvas-animation-demos
+# Canvas Animation in TypeScript
