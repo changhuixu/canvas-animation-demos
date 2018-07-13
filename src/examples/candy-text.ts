@@ -1,6 +1,6 @@
 class Particle {
   public readonly color: string;
-  private realease = false;
+  private flying = false;
   public vx = 0;
   public vy = 0;
 
@@ -9,8 +9,10 @@ class Particle {
   }
 
   draw(ctx: CanvasRenderingContext2D) {
-    this.x += this.vx;
-    this.y += this.vy;
+    if (this.flying) {
+      this.x += this.vx;
+      this.y += this.vy;
+    }
     ctx.fillStyle = this.color;
     ctx.beginPath();
     ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2, true);
@@ -21,11 +23,20 @@ class Particle {
   flyAwayWhenMouseOver(mousePosition: Position) {
     const dx = this.x - mousePosition.x;
     const dy = this.y - mousePosition.y;
-    if (dx * dx + dy * dy < 400 && !this.realease) {
-      this.realease = true;
+    if (dx * dx + dy * dy < 400 && !this.flying) {
+      this.flying = true;
       this.vx = Math.random() * 6 * 2 - 6;
       this.vy = Math.random() * 6 * 2 - 6;
     }
+  }
+
+  isInCanvas(canvasWidth: number, canvasHeight: number) {
+    return !(
+      this.x < -this.radius ||
+      this.y < -this.radius ||
+      this.x > canvasWidth + this.radius ||
+      this.y > canvasHeight + this.radius
+    );
   }
 }
 
@@ -36,6 +47,7 @@ class Position {
 export class CandyText {
   private readonly ctx: CanvasRenderingContext2D;
   private raf: number;
+  private continueAnimating = true;
   private mousePosition = new Position(-100, -100);
   private particles: Particle[] = [];
   private readonly denseness = 10;
@@ -44,15 +56,17 @@ export class CandyText {
 
   constructor(private readonly canvas: HTMLCanvasElement) {
     this.ctx = this.canvas.getContext('2d');
-    this.canvas.addEventListener('mousemove', e => {
-      if (e.layerX || e.layerX == 0) {
-        this.mousePosition.x = e.clientX - canvas.offsetLeft;
-        this.mousePosition.y = e.clientY - canvas.offsetTop;
-      }
-    });
 
+    this.canvas.addEventListener('mousemove', e => {
+      this.calculateMouseRelativePositionInCanvas(e);
+    });
+    this.canvas.addEventListener('mouseenter', () => {
+      this.raf = window.requestAnimationFrame(() => this.animate());
+      this.continueAnimating = true;
+    });
     this.canvas.addEventListener('mouseout', () => {
-      window.cancelAnimationFrame(this.raf);
+      window.cancelAnimationFrame(this.raf); 
+      this.continueAnimating = false;  // stop animation when mouse out.
     });
   }
 
@@ -66,7 +80,7 @@ export class CandyText {
       this.canvas.width,
       this.canvas.height
     );
-    this.clear();
+    this.drawBackground();
 
     // iterate over all pixels - leaving density gaps
     for (let py = 0; py < this.canvas.height; py += this.denseness) {
@@ -79,21 +93,42 @@ export class CandyText {
         }
       }
     }
-    this.raf = window.requestAnimationFrame(() => this.animate());
+    this.animate();
   }
 
-  private clear() {
+  private drawBackground() {
     this.ctx.fillStyle = this.textBackgroundColor;
     this.ctx.rect(0, 0, this.canvas.width, this.canvas.height);
     this.ctx.fill();
   }
 
   private animate() {
-    this.clear();
+    if (!this.particles.length || !this.continueAnimating) {
+      return; // return when nothing needs to animate
+    }
+
+    this.drawBackground();
+    // clean particles are not in canvas to reduce computation
+    this.particles = this.particles.filter(p =>
+      p.isInCanvas(this.canvas.width, this.canvas.height)
+    );
     this.particles.forEach(p => {
       p.flyAwayWhenMouseOver(this.mousePosition);
       p.draw(this.ctx);
     });
-    this.raf = window.requestAnimationFrame(() => this.animate());
+
+    window.requestAnimationFrame(() => this.animate());
+  }
+
+  private calculateMouseRelativePositionInCanvas(e: MouseEvent) {
+    // Note: I have handled scroll effect
+    this.mousePosition.x =
+      e.clientX +
+      (document.documentElement.scrollLeft || document.body.scrollLeft) -
+      this.canvas.offsetLeft;
+    this.mousePosition.y =
+      e.clientY +
+      (document.documentElement.scrollTop || document.body.scrollTop) -
+      this.canvas.offsetTop;
   }
 }
