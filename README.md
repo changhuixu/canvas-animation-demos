@@ -4,7 +4,7 @@ Canvas Animation written in TypeScript. No jQuery and no other 3rd party depende
 
 ## [Demo](https://canvas-animations.firebaseapp.com/)
 
-[Medium Post](https://medium.com/@changhuixu)
+[Medium Post](https://medium.com/@changhuixu/canvas-animations-in-typescript-97ba0163cb19)
 
 This repo includes the following animation examples:
 
