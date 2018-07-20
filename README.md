@@ -1,6 +1,6 @@
 # Canvas Animation in TypeScript
 
-Canvas Animation written in TypeScript. No jQuery and no other 3rd party dependencies.
+Canvas Animation written in TypeScript. No jQuery and no other 3rd party dependencies. You might also interest in [my another repo about canvas animation](https://github.com/changhuixu/canvas-animation-step-by-step).
 
 ## [Demo](https://canvas-animations.firebaseapp.com/)
 
