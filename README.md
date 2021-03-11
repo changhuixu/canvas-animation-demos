@@ -1,5 +1,7 @@
 # Canvas Animation in TypeScript
 
+[![ko-fi](https://ko-fi.com/img/githubbutton_sm.svg)](https://ko-fi.com/I3I63W4OK)
+
 Canvas Animation written in TypeScript. No jQuery and no other 3rd party dependencies. You might also interest in [my another repo about canvas animation](https://github.com/changhuixu/canvas-animation-step-by-step).
 
 ## [Demo](https://canvas-animations.firebaseapp.com/)
@@ -43,3 +45,9 @@ npm start
 // build the app
 npm run build
 ```
+
+## License
+
+Feel free to use the code in this repository as it is under MIT license.
+
+[![ko-fi](https://ko-fi.com/img/githubbutton_sm.svg)](https://ko-fi.com/I3I63W4OK)
